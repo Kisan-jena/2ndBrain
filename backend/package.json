@@ -5,9 +5,7 @@
   "scripts": {
     "dev": "nodemon --exec bun run server.ts",
     "dev:node": "nodemon server.ts",
-    "start": "bun server.ts",
-    "build": "bun build server.ts --outdir ./dist",
-    "prod": "bun dist/server.js"
+    "start": "bun server.ts"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
