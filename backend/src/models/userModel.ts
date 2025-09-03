@@ -11,5 +11,4 @@ const userSchema = new Schema<IUserDocument>({
 });
 
 // Strongly type the model
-export const UserModel: Model<IUserDocument> =
-  models.User || model<IUserDocument>("User", userSchema);
+export const UserModel: Model<IUserDocument> = models.User || model<IUserDocument>("User", userSchema);
