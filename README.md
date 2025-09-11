@@ -321,3 +321,7 @@ const refreshToken = async () => {
     const data = await response.json();
     localStorage.setItem('accessToken', data.accessToken);
 } -->
+
+
+
+http://localhost:3000/api/v1/content/add

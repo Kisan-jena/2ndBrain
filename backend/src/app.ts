@@ -5,6 +5,8 @@ import userRouter from "./routes/userRoutes.ts";
 import contentRouter from './routes/contnetRoutes.ts';
 import linkRouter from './routes/linkRoutes';
 import tagRouter from './routes/tagRoutes';
+import authuser from "./middlewares/userAuth.ts";
+
 
 const app=express()
 
@@ -14,6 +16,7 @@ connectToDb()
 // middlewares
 app.use(express.json())
 app.use(cors())
+
 
 // api end points
 app.use('/api/v1/user',userRouter)

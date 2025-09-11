@@ -1,7 +1,7 @@
 import { UserModel } from "../models/userModel";
 import { RefreshTokenModel } from '../models/refreshTokenModel.ts';
 import bcrypt from 'bcrypt';
-import jwt  from "jsonwebtoken";
+import jwt, { type JwtPayload }  from "jsonwebtoken";
 import { success, z } from 'zod';
 import type { Request, Response } from 'express';
 import { HttpStatusCode,ResponseMessage } from '../types/enums'
@@ -19,16 +19,21 @@ const requireBody = z.object({
         .regex(/[\W_]/, 'Must contain at least one special character'),
 });
 
-// Generate Access Token
+// Generate Access Token / refresh token
 const createAccessToken = (userId: string | ObjectId) => {
-    console.log(jwt.sign({ userId }, env.JWT_SECRET, { expiresIn: '15m' }));
-    return jwt.sign({ userId },env.JWT_SECRET,{ expiresIn: "15m" });
+    return jwt.sign(
+        { userId, type: 'access' },
+        env.JWT_ACCESS_SECRET,
+        { expiresIn: '15m', }
+    );
 };
 
-// Generate Refresh Token
 const createRefreshToken = (userId: string | ObjectId) => {
-    console.log(jwt.sign({ userId }, env.JWT_SECRET, { expiresIn: '7d' }));
-    return jwt.sign({ userId }, env.JWT_SECRET, { expiresIn: "7d" });
+    return jwt.sign(
+        { userId, type: 'refresh' },
+        env.JWT_REFRESH_SECRET,
+        { expiresIn: '7d',}
+    );
 };
 
 // Sign Up
@@ -53,6 +58,13 @@ const registerUser=async(req: Request,res: Response)=>{
                 message: ResponseMessage.EMAIL_ALREADY_EXISTS
             })
         }
+//         {
+//     "name": "anjali new yadav",
+//     "email": "Anjuyadav2@example.com",
+//     "password": "Anjuyadav2@123"
+        // }
+        // "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGMwNjBjMDRiNDFkMzE0MDhhYWRmNDEiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU3NDM4MTY1LCJleHAiOjE3NTc0MzgyMjV9.kxzG5pAExKCUtC_lMa6vckEV4IhDRJqtg6W0yPJnw2s",
+        // "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGMwNjBjMDRiNDFkMzE0MDhhYWRmNDEiLCJ0eXBlIjoicmVmcmVzaCIsImlhdCI6MTc1NzQzODE2NSwiZXhwIjoxNzU4MDQyOTY1fQ.uWChbY3FAiLtOIuMtGP27vntVjWvNE4b9JQVtLs9Yrc"
 
         const hashPass=await bcrypt.hash(parseData.data.password,10)
 
@@ -167,12 +179,16 @@ const refreshAccessToken = async (req: Request, res: Response) => {
             });
         }
         // Verify refresh token
-        const decoded = jwt.verify(refreshToken, env.JWT_SECRET) as any;
-        // console.log(decoded);
+        const decoded = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as JwtPayload;
+        console.log("---------------decoded-----------")
+        console.log(decoded);
+        console.log('----------------decoded----------');
 
         // Check if refresh token exists in DB;
         const tokenDoc = await RefreshTokenModel.findOne({ token: refreshToken });
-        // console.log(tokenDoc);
+        console.log('----------------tokenDoc----------');
+        console.log(tokenDoc);
+        console.log('----------------tokenDoc----------');
         if (!tokenDoc) {
             return res.status(HttpStatusCode.UNAUTHORIZED).json({
                 success: false,

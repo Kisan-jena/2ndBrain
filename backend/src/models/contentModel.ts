@@ -1,27 +1,28 @@
 import mongoose from "mongoose";
 
 const contentType= [
-            'image', 
-            'video', 
-            'article', 
-            'audio',
-            'document',     // PDFs, Word docs, etc.
-            'note',         // Personal notes/thoughts
-            'bookmark',     // Simple bookmarks
-            'tweet',        // Twitter posts
-            'youtube',      // YouTube videos
-            'podcast',      // Podcast episodes
-            'code',         // Code snippets
-            'quote',        // Inspirational quotes
-            'recipe',       // Cooking recipes
-            'book',         // Books/eBooks
-            'course',       // Online courses
-            'link',         // Generic links
-            'presentation', // Slides, PPTs
-            'tool',         // Software tools/apps
-            'research',     // Research papers
-            'news'          // News articles
-        ]
+    'image',
+    'video', 
+    'article', 
+    'audio',
+    'document',     // PDFs, Word docs, etc.  
+    'note',         // Personal notes/thoughts      
+    'bookmark',     // Simple bookmarks    
+    'tweet',        // Twitter posts
+    'youtube',      // YouTube videos
+    'podcast',      // Podcast episodes 
+    'code',         // Code snippets   
+    'quote',        // Inspirational quotes
+    'recipe',       // Cooking recipes      
+    'book',         // Books/eBooks    
+    'course',       // Online courses  
+    'link',         // Generic links
+    'presentation', // Slides, PPTs
+    'tool',         // Software tools/apps    
+    'research',     // Research papers         
+    'news',          // News articles   
+    'other'         // Miscellaneous content
+]
 
 const contentSchema=new mongoose.Schema({
     link: { type: String, required: true },
