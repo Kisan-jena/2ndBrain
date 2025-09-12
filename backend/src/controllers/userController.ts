@@ -2,7 +2,7 @@ import { UserModel } from "../models/userModel";
 import { RefreshTokenModel } from '../models/refreshTokenModel.ts';
 import bcrypt from 'bcrypt';
 import jwt, { type JwtPayload }  from "jsonwebtoken";
-import { success, z } from 'zod';
+import { z } from 'zod';
 import type { Request, Response } from 'express';
 import { HttpStatusCode,ResponseMessage } from '../types/enums'
 import { env } from "../config/env"
@@ -38,35 +38,28 @@ const createRefreshToken = (userId: string | ObjectId) => {
 
 // Sign Up
 const registerUser=async(req: Request,res: Response)=>{
-    const {name,email,password}=req.body
-    try{
+    const { name, email, password } = req.body;
+    try {
         const parseData = requireBody.safeParse(req.body);
         // console.log(requireBody.safeParse(req.body))
         // console.log(requireBody.parse(req.body))
 
         if (!parseData.success){
-            return res.status(400).json({
-                success: false,
-                message: ResponseMessage.INVALID_CREDENTIALS
-            })
+            return res.status(HttpStatusCode.BAD_REQUEST).json({
+              success: false,
+              message: ResponseMessage.INVALID_CREDENTIALS,
+            });
         }
 
-        const emailAllreadyExsits=await UserModel.findOne({email:parseData.data.email})
-        if (emailAllreadyExsits){
+        const emailAllreadyExsits = await UserModel.findOne({ email: parseData.data.email });
+        if (emailAllreadyExsits) {
             return res.status(HttpStatusCode.CONFLICT).json({
                 success: false,
                 message: ResponseMessage.EMAIL_ALREADY_EXISTS
             })
         }
-//         {
-//     "name": "anjali new yadav",
-//     "email": "Anjuyadav2@example.com",
-//     "password": "Anjuyadav2@123"
-        // }
-        // "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGMwNjBjMDRiNDFkMzE0MDhhYWRmNDEiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU3NDM4MTY1LCJleHAiOjE3NTc0MzgyMjV9.kxzG5pAExKCUtC_lMa6vckEV4IhDRJqtg6W0yPJnw2s",
-        // "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGMwNjBjMDRiNDFkMzE0MDhhYWRmNDEiLCJ0eXBlIjoicmVmcmVzaCIsImlhdCI6MTc1NzQzODE2NSwiZXhwIjoxNzU4MDQyOTY1fQ.uWChbY3FAiLtOIuMtGP27vntVjWvNE4b9JQVtLs9Yrc"
 
-        const hashPass=await bcrypt.hash(parseData.data.password,10)
+        const hashPass = await bcrypt.hash(parseData.data.password, 10)
 
         const user = await UserModel.create({
             name: parseData.data.name,

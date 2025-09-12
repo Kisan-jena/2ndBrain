@@ -1,7 +1,14 @@
-import mongoose from "mongoose";
+import { Schema, model, models, Document, Model } from 'mongoose';
 
-const tagSchema=new mongoose.Schema({
-    title:{type:String,required:true,unique:true}
+// Define interface for Tag document
+export interface ITag extends Document {
+  title: string;
+}
+
+// Define schema
+const tagSchema = new Schema({
+  title: { type: String, required: true, unique: true },
 });
 
-export const TagModel=mongoose.models.tag || mongoose.model("tag",tagSchema) ;
+// Create and export the model with proper typing
+export const TagModel: Model<ITag> = models.Tag || model<ITag>('Tag', tagSchema);

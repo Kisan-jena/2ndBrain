@@ -1,60 +1,158 @@
-import { UserModel } from '../models/userModel'; // Adjust the path according to your project structure
+import { type Request, type Response } from 'express';
+import mongoose from 'mongoose';
+import type { ContentType } from '../models/contentModel';
+import { ContentModel } from '../models/contentModel';
+import { UserModel } from '../models/userModel';
+import { HttpStatusCode, ResponseMessage } from '../types/enums';
 
-const addContent = async (req: any, res: any) => {
-  const userId = req.userId; // ✅ Get userId from middleware, not req.body
-  console.log('USERID', userId);
+// Create a proper UserRequest interface that extends Request
+interface UserRequest extends Request {
+  userId?: string ; // Match the auth middleware's definition
+  body: {
+    link?: string;
+    type?: string;
+    title?: string;
+    tags?: mongoose.Types.ObjectId[];
+    description?: string;
+    isPriority?: boolean;
+  };
+}
 
-  if (!userId) {
-    return res.status(401).json({
-      success: false,
-      message: 'User not authenticated',
-    });
-    }
-    
-    // find user in db
-    const user = await UserModel.findById(userId);
-    if (!user) {
-      return res.status(404).json({
+// Content creation controller
+const addContent = async (req: UserRequest, res: Response) => {
+  try {
+    const { link, type, title, tags, description, isPriority } = req.body;
+    const userId = req.userId;
+    console.log('USERID', userId);
+
+    if (!userId) {
+      return res.status(HttpStatusCode.UNAUTHORIZED).json({
         success: false,
-        message: 'User not found',
+        message: ResponseMessage.UNAUTHORIZED,
       });
     }
 
-  // Your content creation logic here...
-  res.json({
-    success: true,
-    message: `add content for user ${userId}`,
-    userId: userId,
-  });
-};
+    // Validate required fields
+    if (!link || !type || !title) {
+      return res.status(HttpStatusCode.BAD_REQUEST).json({
+        success: false,
+        message: ResponseMessage.BAD_REQUEST,
+        error: 'Link, type, and title are required fields',
+      });
+    }
 
-const getContent = async (req: any, res: any) => {
-  const userId = req.userId; // ✅ Get userId from middleware
-  console.log('get content for user:', userId);
+    // find user in db
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(HttpStatusCode.NOT_FOUND).json({
+        success: false,
+        message: ResponseMessage.USER_NOT_FOUND,
+      });
+    }
 
-  if (!userId) {
-    return res.status(401).json({
+    // create content with proper typing
+    const content = new ContentModel({
+      link,
+      type,
+      title,
+      tags: tags || [],
+      description,
+      isPriority,
+      userId: new mongoose.Types.ObjectId(userId),
+    });
+
+    const savedContent = await content.save();
+
+    return res.status(HttpStatusCode.CREATED).json({
+      success: true,
+      message: ResponseMessage.CONTENT_CREATED,
+      data: savedContent,
+    });
+    
+  } catch (error) {
+    console.error('Content creation error:', error);
+    const errorMessage =
+      error instanceof Error ? error.message : 'An unknown error occurred';
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: 'User not authenticated',
+      message: ResponseMessage.INTERNAL_ERROR,
+      error: errorMessage,
     });
   }
-
-  // Your get content logic here...
-  res.json({
-    success: true,
-    message: 'getContent',
-    userId: userId,
-  });
 };
 
-const updateContent = async (req: any, res: any) => {
-  console.log('update content');
-  res.json({ message: 'update content cont' });
+// Get content for the authenticated user
+const getContent = async (req: UserRequest, res: Response) => {
+  try {
+    const userId = req.userId;
+    console.log('USERID', userId);
+
+    if (!userId) {
+      return res.status(HttpStatusCode.UNAUTHORIZED).json({
+        success: false,
+        message: ResponseMessage.UNAUTHORIZED,
+      });
+    }
+
+    // find user in db
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(HttpStatusCode.NOT_FOUND).json({
+        success: false,
+        message: ResponseMessage.USER_NOT_FOUND,
+      });
+    }
+
+    // fetch content for the user
+    const content = await ContentModel.find({ userId: user._id }).exec();
+
+    return res.status(HttpStatusCode.OK).json({
+      success: true,
+      message: ResponseMessage.SUCCESS,
+      data: content,
+    });
+  } catch (error) {
+    console.error('Content retrieval error:', error);
+    const errorMessage =
+      error instanceof Error ? error.message : 'An unknown error occurred';
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: ResponseMessage.INTERNAL_ERROR,
+      error: errorMessage,
+    });
+  }
 };
 
-const deleteContent = async (req: any, res: any) => {
-  console.log('delete content');
-  res.json({ message: 'delete content cont' });
+// Update existing content
+const updateContent = async (req: UserRequest, res: Response) => {
+  try {
+    
+  } catch (error) {
+    console.error('Content update error:', error);
+    const errorMessage =
+      error instanceof Error ? error.message : 'An unknown error occurred';
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: ResponseMessage.INTERNAL_ERROR,
+      error: errorMessage,
+    });
+  }
+};
+
+// Delete content
+const deleteContent = async (req: UserRequest, res: Response) => {
+  try {
+   
+  } catch (error) {
+    console.error('Content deletion error:', error);
+    const errorMessage =
+      error instanceof Error ? error.message : 'An unknown error occurred';
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: ResponseMessage.INTERNAL_ERROR,
+      error: errorMessage,
+    });
+  }
 };
 
 export { addContent, deleteContent, getContent, updateContent };
