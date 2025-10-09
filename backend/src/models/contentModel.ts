@@ -47,10 +47,10 @@ const contentSchema = new mongoose.Schema(
     link: { type: String, required: true },
     type: { type: String, enum: contentType, required: true },
     title: { type: String, required: true },
-    tags: [{ type: mongoose.Schema.Types.ObjectId, ref: 'tag' }],
+    tags: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag' }],
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'user',
+      ref: 'User',
       required: true,
     },
     description: { type: String }, // Optional notes

@@ -10,5 +10,4 @@ const getAllTags = async (req: any, res: any) => {
     res.json({ message: 'get all tags' });
 }
 
-
-export { createTag, getAllTags}
+export { createTag, getAllTags };
