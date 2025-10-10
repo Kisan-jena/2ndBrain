@@ -38,7 +38,6 @@ const createRefreshToken = (userId: string | ObjectId) => {
 
 // Sign Up
 const registerUser=async(req: Request,res: Response)=>{
-    const { name, email, password } = req.body;
     try {
         const parseData = requireBody.safeParse(req.body);
         // console.log(requireBody.safeParse(req.body))
