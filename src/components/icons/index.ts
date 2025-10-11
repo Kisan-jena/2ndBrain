@@ -13,4 +13,6 @@ export {
   FiSettings,
   FiTrash2,
   FiUser,
+  FiShare,
+  FiShare2,
 } from 'react-icons/fi';
