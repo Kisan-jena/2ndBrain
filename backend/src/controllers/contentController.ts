@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { ContentModel } from '../models/contentModel';
 import { TagModel } from '../models/tagModel';
 import { UserModel } from '../models/userModel';
@@ -51,12 +51,12 @@ const addContent = async (req: UserRequest, res: Response) => {
     }
 
     // Handle tags: find existing or create new ones
-    let tagIds: mongoose.Types.ObjectId[] = [];
+    const tagIds: mongoose.Types.ObjectId[] = [];
 
     if (tags && tags.length > 0) {
       for (const tagTitle of tags) {
         // Check if tag already exists (case-insensitive)
-        let existingTag = await TagModel.findOne({
+        const existingTag = await TagModel.findOne({
           title: { $regex: new RegExp(`^${tagTitle}$`, 'i') },
         });
 
@@ -205,7 +205,7 @@ const updateContent = async (req: UserRequest, res: Response) => {
 
       for (const tagTitle of tags) {
         // Check if tag already exists (case-insensitive)
-        let existingTag = await TagModel.findOne({
+        const existingTag = await TagModel.findOne({
           title: { $regex: new RegExp(`^${tagTitle}$`, 'i') },
         });
 
@@ -225,8 +225,20 @@ const updateContent = async (req: UserRequest, res: Response) => {
       }
     }
 
+    interface IContent {
+      _id: Types.ObjectId;
+      link: string;
+      type: string;
+      title: string;
+      tags: Types.ObjectId[];
+      description?: string;
+      isPriority?: boolean;
+      createdAt?: Date;
+      updatedAt?: Date;
+    }
+
     // Update only the fields that are provided
-    const updateData: any = {};
+    const updateData: Partial<IContent> = {}; // Use Partial to allow optional fields
 
     if (link) updateData.link = link;
     if (type) updateData.type = type;

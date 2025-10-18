@@ -1,9 +1,13 @@
 import express from 'express';
-import { createShareableLink, getSharedBrain } from '../controllers/linkController';
+import {
+  createShareableLink,
+  getSharedBrain,
+} from '../controllers/linkController';
+import authuser from '../middlewares/userAuth';
 
 const linkRouter = express.Router();
 
-linkRouter.post('/share', createShareableLink);
+linkRouter.post('/create', authuser, createShareableLink);
 linkRouter.get('/:shareLink', getSharedBrain);
 
 export default linkRouter;
