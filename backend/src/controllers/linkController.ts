@@ -12,10 +12,7 @@ interface AuthenticatedRequest extends Request {
   };
 }
 
-const createShareableLink = async (
-  req: AuthenticatedRequest,
-  res: Response
-) => {
+const createShareableLink = async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.userId) {
       // share == true
@@ -24,7 +21,7 @@ const createShareableLink = async (
         message: ResponseMessage.UNAUTHORIZED,
       });
     }
-
+    
     const { share } = req.body;
     if (share) {
       const link = createLink(20);
